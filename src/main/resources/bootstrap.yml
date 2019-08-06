@@ -1,0 +1,11 @@
+---
+applications:
+- name: aau-java
+  path: target/aau-0.0.1-SNAPSHOT.jar
+  domain: cfapps.io
+  memory: 512M
+  instances: 1
+  services:
+      - app-java
+  
+  #cf push -p jar appName
