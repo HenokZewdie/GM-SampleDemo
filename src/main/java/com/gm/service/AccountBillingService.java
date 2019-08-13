@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.gm.model.OnStarProfileSubscription;
 import com.gm.model.SubscriptionAndUserDetailsToStoreIntoTheDB;
+import com.gm.model.User;
 import com.gm.model.Users;
 import com.google.gson.Gson;
 
@@ -22,7 +23,7 @@ public class AccountBillingService {
 	@Autowired
 	RestTemplate restTemplate;
 	
-	public SubscriptionAndUserDetailsToStoreIntoTheDB getUsersDetails() throws JsonParseException, JsonMappingException, IOException{
+	public SubscriptionAndUserDetailsToStoreIntoTheDB getUsersDetails(String userId) throws JsonParseException, JsonMappingException, IOException{
 		SubscriptionAndUserDetailsToStoreIntoTheDB detailsToStoreIntoTheDB = new SubscriptionAndUserDetailsToStoreIntoTheDB();
 		Users user = new Users();
 		Gson gson = new Gson();
@@ -30,7 +31,7 @@ public class AccountBillingService {
 		String url="http://localhost:2131/users/getAllUserInformation";
 		//TODO... get the data from subscription
 		String onSiteUrl="http://localhost:2131/getDataFromSubscription";
-		HttpEntity<?>  entity = new HttpEntity<>(headers);
+		HttpEntity<String>  entity = new HttpEntity<String>(userId, headers);
 		ResponseEntity<String> onStarResponseEntity = null;
 		ResponseEntity<String> accountBillingResponseEntity = null;
 		try
