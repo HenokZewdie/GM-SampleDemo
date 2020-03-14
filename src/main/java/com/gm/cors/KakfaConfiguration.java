@@ -51,7 +51,7 @@ public class KakfaConfiguration {
     //SUBSCRIBE
     
     @Bean
-    public ConsumerFactory<String, OnStarProfileSubscription> consumerFactory() {
+    public ConsumerFactory<String, SubscriptionAndUserDetailsToStoreIntoTheDB> consumerFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
@@ -64,15 +64,16 @@ public class KakfaConfiguration {
 
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, OnStarProfileSubscription> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, OnStarProfileSubscription> factory = new ConcurrentKafkaListenerContainerFactory();
+    public ConcurrentKafkaListenerContainerFactory<String, SubscriptionAndUserDetailsToStoreIntoTheDB> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, SubscriptionAndUserDetailsToStoreIntoTheDB> factory = new ConcurrentKafkaListenerContainerFactory();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
 
 
+    
     @Bean
-    public ConsumerFactory<String, OnStarProfileSubscription> userConsumerFactory() {
+    public ConsumerFactory<String, SubscriptionAndUserDetailsToStoreIntoTheDB> userConsumerFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
@@ -80,12 +81,13 @@ public class KakfaConfiguration {
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
-                new JsonDeserializer<>(OnStarProfileSubscription.class));
+                new JsonDeserializer<>(SubscriptionAndUserDetailsToStoreIntoTheDB.class));
     }
 
+    //I use this method name as a value for containerFactory in the controller line58/59 when I listen from the topic
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, OnStarProfileSubscription> userKafkaListenerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, OnStarProfileSubscription> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, SubscriptionAndUserDetailsToStoreIntoTheDB> userKafkaListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, SubscriptionAndUserDetailsToStoreIntoTheDB> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(userConsumerFactory());
         return factory;
     }

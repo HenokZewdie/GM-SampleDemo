@@ -23,15 +23,15 @@ public class AccountBillingService {
 	@Autowired
 	RestTemplate restTemplate;
 	
-	public SubscriptionAndUserDetailsToStoreIntoTheDB getUsersDetails(String userId) throws JsonParseException, JsonMappingException, IOException{
+	public SubscriptionAndUserDetailsToStoreIntoTheDB getUsersDetails() throws JsonParseException, JsonMappingException, IOException{
 		SubscriptionAndUserDetailsToStoreIntoTheDB detailsToStoreIntoTheDB = new SubscriptionAndUserDetailsToStoreIntoTheDB();
 		Users user = new Users();
 		Gson gson = new Gson();
 		HttpHeaders headers = new HttpHeaders();
-		String url="http://localhost:2131/users/getAllUserInformation";
+		String url="http://localhost:2131/users/getUserInformation";
 		//TODO... get the data from subscription
 		String onSiteUrl="http://localhost:2131/getDataFromSubscription";
-		HttpEntity<String>  entity = new HttpEntity<String>(userId, headers);
+		HttpEntity<String>  entity = new HttpEntity<String>(headers);
 		ResponseEntity<String> onStarResponseEntity = null;
 		ResponseEntity<String> accountBillingResponseEntity = null;
 		try

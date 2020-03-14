@@ -30,18 +30,16 @@ public class Controller {
 	@Autowired
 	MongoTemplate mongoTemplate;
 
-	//@RequestMapping(value = "/getUsersDetails", method = RequestMethod.GET)
-	public SubscriptionAndUserDetailsToStoreIntoTheDB getAllUser(String userId) throws JsonParseException, JsonMappingException, IOException {
-		String response = "ERROR on STORING TO THE DB";
-		SubscriptionAndUserDetailsToStoreIntoTheDB detailsToStoreIntoTheDB = null;
-		try {
-			//TODO... SAGA
-			detailsToStoreIntoTheDB = service.getUsersDetails(userId);
-			mongoTemplate.save(detailsToStoreIntoTheDB);
-			response = "Successfully stored in the DB";
-		} catch (Exception e) {
+	@RequestMapping(value = "/getUsersDetails", method = RequestMethod.GET)
+		public SubscriptionAndUserDetailsToStoreIntoTheDB getAllUser() throws JsonParseException, JsonMappingException, IOException {
+			SubscriptionAndUserDetailsToStoreIntoTheDB detailsToStoreIntoTheDB = null;		
+			String response = "ERROR on STORING TO THE DB";
+			try {
+				detailsToStoreIntoTheDB = service.getUsersDetails();
+				response = "Successfully stored in the DB";
+			} catch (Exception e) {
 
-		}
+			}
 		
 		post(detailsToStoreIntoTheDB);
 		return detailsToStoreIntoTheDB;
@@ -49,24 +47,22 @@ public class Controller {
 
 	//TODO ... instead of calling the api, pass the SubscriptionAndUserDetailsToStoreIntoTheDB to the method to publish
 	@RequestMapping(value = "/publish", method = RequestMethod.GET)
-	public SubscriptionAndUserDetailsToStoreIntoTheDB post(SubscriptionAndUserDetailsToStoreIntoTheDB detailsToStoreIntoTheDB) throws JsonParseException, JsonMappingException, IOException {
+	public void  post(SubscriptionAndUserDetailsToStoreIntoTheDB detailsToStoreIntoTheDB) throws JsonParseException, JsonMappingException, IOException {
 		//No need to use the next line if SubscriptionAndUserDetailsToStoreIntoTheDB is passed
 		//SubscriptionAndUserDetailsToStoreIntoTheDB detailsToStoreIntoTheDB = service.getUsersDetails(userId);
-		kafkaTemplate.send(TOPIC, detailsToStoreIntoTheDB);
-
-		return detailsToStoreIntoTheDB;
+		kafkaTemplate.send(TOPIC, "eventName", detailsToStoreIntoTheDB);
+		//return detailsToStoreIntoTheDB;
 	}
 
-    @KafkaListener(topics = "OnStarService", group = "group_json",
+    @KafkaListener(topics = TOPIC, group = "group_json",
             containerFactory = "userKafkaListenerFactory")
-    public SubscriptionAndUserDetailsToStoreIntoTheDB consumeJson(OnStarProfileSubscription  onStarProfileSubscription) throws JsonParseException, JsonMappingException, IOException {
-        System.out.println("Consumed JSON Message: " + onStarProfileSubscription.getUserId());
-        SubscriptionAndUserDetailsToStoreIntoTheDB  detailsToStoreIntoTheDB =  getAllUser(onStarProfileSubscription.getUserId());
-        return detailsToStoreIntoTheDB;
+    public void consumeJson(SubscriptionAndUserDetailsToStoreIntoTheDB  onStarProfileSubscription) throws JsonParseException, JsonMappingException, IOException {
+        System.out.println("Consumed JSON Message $$$$$$$$$$: " + onStarProfileSubscription.getUsers().getOffset());
+       mongoTemplate.save(onStarProfileSubscription);
+        System.out.println("Saved to DB SUCCESSFULLY");
     }
     
 	
-    
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST)
 	public User registerUser(@RequestBody User userReceived) {
 
